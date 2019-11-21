@@ -1,0 +1,11 @@
+---
+layout: post
+author: Vulkey_Chen
+title: "BurpSuite插件：MarkINFO敏感信息标记"
+date: 2019-08-22
+music-id: 
+permalink: /archives/2019-08-22/1
+description: "MarkINFO敏感信息标记"
+---
+
+<video src="https://vulkey.oss-cn-hangzhou.aliyuncs.com/markinfo/MarkINFO%E6%95%8F%E6%84%9F%E4%BF%A1%E6%81%AF%E6%A0%87%E8%AE%B0.mp4" controls="controls"></video>

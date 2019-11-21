@@ -1,0 +1,200 @@
+I"� <h1 id="deepexploit工具调研">DeepExploit工具调研</h1>
+
+<p>Deep Exploit是一款可与Metasploit链接使用，且结合机器学习的全自动渗透测试工具。</p>
+
+<h2 id="0x00-安装">0x00 安装</h2>
+
+<h3 id="安装步骤">安装步骤</h3>
+
+<p>根据官方安装手册：https://github.com/13o-bbr-bbq/machine_learning_security/wiki/Installation</p>
+
+<ol>
+  <li>
+    <p>安装Kali</p>
+  </li>
+  <li>
+    <p>命令执行<code class="highlighter-rouge">git clone https://github.com/13o-bbr-bbq/machine_learning_security.git</code></p>
+  </li>
+  <li>
+    <p>命令执行 安装python3的pip<code class="highlighter-rouge">apt-get install python3-pip</code></p>
+  </li>
+  <li>
+    <p>切换到DeepExploit目录下运行<code class="highlighter-rouge">pip3 install -r requirements.txt</code></p>
+  </li>
+  <li>
+    <p>编辑<code class="highlighter-rouge">config.ini</code>，修改其中的<code class="highlighter-rouge">server_host</code>为本机IP(ifconfig查看一下～)</p>
+  </li>
+  <li>
+    <p>编辑<code class="highlighter-rouge">proxychains.conf</code>，修改监听IP和端口（要求和DeepExploit目录下<code class="highlighter-rouge">config.ini</code>的<code class="highlighter-rouge">proxy_host</code>、<code class="highlighter-rouge">proxy_port</code>对应）</p>
+  </li>
+  <li>
+    <p>初始化Metasploit DB，命令执行<code class="highlighter-rouge">msfdb init</code></p>
+  </li>
+  <li>
+    <p>启动Metasploit，命令执行<code class="highlighter-rouge">msfconsole</code></p>
+  </li>
+  <li>
+    <p>启动Metasploit RPC服务，命令执行</p>
+
+    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>msf &gt; load msgrpc ServerHost=172.16.108.139 ServerPort=55553 User=test Pass=test1234
+[*] MSGRPC Service:  172.16.108.139:55553 
+[*] MSGRPC Username: test
+[*] MSGRPC Password: test1234
+[*] Successfully loaded plugin: msgrpc
+</code></pre></div>    </div>
+  </li>
+</ol>
+
+<h3 id="安装的坑记录">安装的坑记录</h3>
+
+<ul>
+  <li>
+    <p>安装Scrapy库时报Twisted错误</p>
+
+    <blockquote>
+      <p>Python.h: No such file or directory</p>
+    </blockquote>
+
+    <p>解决方法：运行命令<code class="highlighter-rouge">sudo apt install python3.6-dev</code>安装<code class="highlighter-rouge">python3.6-dev</code></p>
+  </li>
+  <li>
+    <p>运行DeepExploit报错</p>
+
+    <blockquote>
+      <p>ImportError: numpy.core.multiarray failed to import</p>
+    </blockquote>
+
+    <p>解决方法：输入python3进入交互界面-&gt;<code class="highlighter-rouge">import numpy</code>-&gt;<code class="highlighter-rouge">print(numpy.__path__)</code>-&gt;获得numpy的安装路径退出交互界面，运行<code class="highlighter-rouge">sudo rm -r 安装路径</code>删除numpy，然后运行<code class="highlighter-rouge">sudo apt install python3-numpy</code></p>
+  </li>
+  <li>
+    <p>运行时会报错</p>
+
+    <blockquote>
+      <p>/usr/lib/python3/dist-packages/requests/<strong>init</strong>.py:80: RequestsDependencyWarning: urllib3 (1.24.1) or chardet (3.0.4) doesn’t match a supported version!</p>
+    </blockquote>
+
+    <p>查阅了一下资料说这个提示不会影响使用，所以无需处理。</p>
+  </li>
+</ul>
+
+<h2 id="0x01-使用工作原理">0x01 使用&amp;工作原理</h2>
+
+<h3 id="deepexploit-train模式">DeepExploit Train模式</h3>
+
+<p>执行命令：<code class="highlighter-rouge">python3 DeepExploit.py -t 地址 -m train</code></p>
+
+<table>
+  <thead>
+    <tr>
+      <th>command options</th>
+      <th>description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-t, –target</td>
+      <td>训练易受攻击主机的IP地址</td>
+    </tr>
+    <tr>
+      <td>-m, –mode</td>
+      <td>执行模式”训练”</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><img src="https://vulkey.oss-cn-hangzhou.aliyuncs.com/2019-07-04/0.png" alt="train" /></p>
+
+<h4 id="训练过程">训练过程</h4>
+
+<p>功能有点像Metasploit之前的db_autopwn。</p>
+
+<ul>
+  <li>
+    <p>通过Nmap进行端口扫描，将扫描结果进行输出：<code class="highlighter-rouge">[*] nmap -p0-65535 -T5 -Pn -sV -sT --min-rate 1000 -oX nmap_result_172.16.108.140.xml 172.16.108.140</code></p>
+  </li>
+  <li>
+    <p>从扫描结果中获取已开放的端口信息：<code class="highlighter-rouge">[+] Get port list from nmap_result_172.16.108.140.xml.</code></p>
+  </li>
+  <li>
+    <p>载入Metasploit的Exploit模块列表：<code class="highlighter-rouge">[+] Get exploit list.</code>，载入Metaploit的Payload模块列表：<code class="highlighter-rouge">[+] Get payload list.</code>，获取每个模块的选项设置信息。</p>
+
+    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[+] Get exploit list.
+[*] Loaded exploit list from : /root/machine_learning_security/DeepExploit/data/exploit_list.csv
+[+] Get payload list.
+[*] Loaded payload list from : /root/machine_learning_security/DeepExploit/data/payload_list.csv
+[+] Get exploit tree.
+[*] Loaded exploit tree from : /root/machine_learning_security/DeepExploit/data/exploit_tree.json
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>获取端口信息，检查WEB端口<code class="highlighter-rouge">[+] Get target info. [+] Check web port.</code>，针对开放的WEB服务进行站内链接爬虫。</p>
+  </li>
+  <li>
+    <p>针对爬虫爬取的链接进行CMS指纹识别（静态规则针对链接的响应内容进行分析）</p>
+
+    <p><img src="https://vulkey.oss-cn-hangzhou.aliyuncs.com/2019-07-04/1.png" alt="cms" /></p>
+
+    <p>载入字典对网站目录进行暴力猜解：</p>
+
+    <p><img src="https://vulkey.oss-cn-hangzhou.aliyuncs.com/2019-07-04/6.png" alt="" /></p>
+  </li>
+  <li>
+    <p>分析开放的端口（获取端口对应的服务等信息）选择对应的信息的测试模块（metasploit）</p>
+
+    <p><img src="https://vulkey.oss-cn-hangzhou.aliyuncs.com/2019-07-04/7.png" alt="" /></p>
+  </li>
+  <li>
+    <p>载入Metasploit模块进行自动化测试</p>
+
+    <p><img src="https://vulkey.oss-cn-hangzhou.aliyuncs.com/2019-07-04/2.png" alt="exploit" /></p>
+  </li>
+  <li>
+    <p>训练结束：</p>
+
+    <p><img src="https://vulkey.oss-cn-hangzhou.aliyuncs.com/2019-07-04/3.png" alt="end" /></p>
+  </li>
+</ul>
+
+<h4 id="训练结果报告">训练结果报告</h4>
+
+<p>最终测试结束以后，报告会存储在<code class="highlighter-rouge">/report/train</code>下：</p>
+
+<p><img src="https://vulkey.oss-cn-hangzhou.aliyuncs.com/2019-07-04/4.png" alt="result" /></p>
+
+<p>切换到DeepExploit目录下执行命令：<code class="highlighter-rouge">python3 CreateReport.py -m train </code></p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">[</span>+] Creating training report.
+<span class="o">[</span><span class="k">*</span><span class="o">]</span> Creating training report <span class="k">done</span><span class="nb">.</span>
+</code></pre></div></div>
+
+<p>在<code class="highlighter-rouge">/report/train</code>目录下会多出一个<code class="highlighter-rouge">DeepExploit_train_report.html</code>的HTML报告文件，打开查看结果：</p>
+
+<p><img src="https://vulkey.oss-cn-hangzhou.aliyuncs.com/2019-07-04/5.png" alt="result" /></p>
+
+<h3 id="deepexploit-test模式">DeepExploit Test模式</h3>
+
+<p>执行命令<code class="highlighter-rouge">python3 DeepExploit.py -t 172.16.108.140 -m test</code></p>
+
+<p>流程与DeepExploit Train模式一样，如果Deep Exploit成功利用了目标服务器，它会进一步的对其他内部服务器进行横行攻击。</p>
+
+<h3 id="问题">问题</h3>
+
+<p>测试靶机有445端口开放，并且存在漏洞。</p>
+
+<p>DeepExploit在做探测的时候也检测到了端口的开放情况：</p>
+
+<p><img src="https://vulkey.oss-cn-hangzhou.aliyuncs.com/2019-07-04/8.png" alt="" /></p>
+
+<p>但是445端口在匹配Metasploit模块的时候却是0，没有利用模块：</p>
+
+<p><img src="https://vulkey.oss-cn-hangzhou.aliyuncs.com/2019-07-04/9.png" alt="" /></p>
+
+<p>端口匹配模块使用的是Metasploit的search语法：</p>
+
+<p><code class="highlighter-rouge">search_cmd = 'search name:' + service_name + ' type:exploit app:server\n'</code></p>
+
+<p>调试输出service_name，发现445端口的是unknown，所以无法搜索出利用模块。</p>
+
+<p><img src="https://vulkey.oss-cn-hangzhou.aliyuncs.com/2019-07-04/10.png" alt="" /></p>
+
+:ET
