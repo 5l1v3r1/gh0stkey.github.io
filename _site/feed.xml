@@ -7,6 +7,16 @@
     
       
         <item>
+          <title>BurpSuite系列 | 基础技巧（一）</title>
+          <description>BurpSuite系列 | 基础技巧（一）</description>
+          <pubDate>2020-02-13T00:00:00+08:00</pubDate>
+          <link>http://localhost:4000/archives/2020-02-13/1</link>
+          <guid isPermaLink="true">http://localhost:4000/archives/2020-02-13/1</guid>
+        </item>
+      
+    
+      
+        <item>
           <title>ModSecurity 拒绝服务漏洞 (CVE-2019-19886) 复现</title>
           <description>ModSecurity 拒绝服务漏洞 (CVE-2019-19886) 复现</description>
           <pubDate>2020-01-24T00:00:00+08:00</pubDate>
