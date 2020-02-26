@@ -3,9 +3,9 @@ layout: page
 title: 友情链接
 ---
 
-**\# Web安全**
+**\# 渗透测试**
 
-[CoolCat](https://blog.gzsec.org) \| [楼兰](http://www.teagle.top/)
+[CoolCat](https://blog.gzsec.org) \| [楼兰](http://www.teagle.top/) \| [三米前有蕉皮](https://www.cnblogs.com/Kali-Team/) \| [Lz1y](https://www.lz1y.cn/)
 
 **\# 二进制**
 
