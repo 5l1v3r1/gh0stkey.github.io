@@ -1,9 +1,0 @@
-I"<script src="/assets/avlist.js"></script>
-
-<center>
-	<h4>tasklist /svc</h4><br />
-	<textarea style="width: 500px; height: 341px;" id="content"></textarea><br /><br />
-	<input type="submit" id="search" value="查询" onclick="getAVName();" /><br />
-	<div id="result"></div>
-</center>
-:ET
