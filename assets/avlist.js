@@ -523,7 +523,9 @@ avList = {
 	"QQPCTray.exe": "QQ电脑管家",
 	"KSafeTray.exe": "金山毒霸",
 	"KSafeSvc.exe": "金山毒霸",
-	"KWatch.exe": "金山毒霸"
+	"KWatch.exe": "金山毒霸",
+	"gov_defence_service.exe": "云锁",
+	"gov_defence_daemon.exe": "云锁"
 };
 
 function getAVName(){
